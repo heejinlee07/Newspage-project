@@ -1,14 +1,11 @@
 // api를 요청하고 뉴스 데이터가 들어 있는 배열을 컴포넌트 배열로 변환하여 렌더링
 // props로 받아온 category에 따라 카테고리를 지정하여 api요청
 
-//커스텀 훅 usePromise 사용 이렇게 하면 따로 상태 관리와 useEffect 설정 하지 않아도 됨.
-
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import NewsItem from "./NewsItem";
 import { api } from "../utils/NewsApi";
 import { API_KEY } from "../utils/NewsKey";
-import usePromise from "../lib/usePromise";
 
 const NewsListBlock = styled.div`
   box-sizing: border-box;
@@ -23,27 +20,32 @@ const NewsListBlock = styled.div`
   }
 `;
 
-const NewsList = ({ category }) => {
-  const [loading, response, error] = usePromise(() => {
-    const query = category === "all" ? "" : `&category=${category}`;
-    return api.get(`top-headlines?country=kr${query}&apiKey=${API_KEY}`);
+const NewsListBefore = ({ category }) => {
+  const [articles, setArticles] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const query = category === "all" ? "" : `&category=${category}`;
+        const response = await api.get(`top-headlines?country=kr${query}&apiKey=${API_KEY}`);
+        setArticles(response.data.articles);
+        console.log(response.data.articles);
+      } catch (e) {
+        console.log(e);
+      }
+      setLoading(false);
+    };
+    fetchData();
   }, [category]);
 
   if (loading) {
     return <NewsListBlock>대기중...</NewsListBlock>;
   }
-
-  //아직 response 값이 설정되지 않았을 때
-  if (!response) {
+  if (!articles) {
     return null;
   }
-
-  if (error) {
-    return <NewsListBlock>에러발생!!!!</NewsListBlock>;
-  }
-
-  //response 값이 유효할 때
-  const { articles } = response.data;
   return (
     <NewsListBlock>
       {articles.map((article) => (
@@ -53,4 +55,4 @@ const NewsList = ({ category }) => {
   );
 };
 
-export default NewsList;
+export default NewsListBefore;

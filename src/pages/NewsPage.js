@@ -20,4 +20,5 @@ export default NewsPage;
  * url 파라미터를 통해 선택된 category 값을 사용한다면
  * Categories 컴포넌트에서 현재 선택된 카테고리 값을 알려줄
  * 필요 없고, onSelect 함수를 전달해줄 필요없음.
+ * 이 방식으로 사용하는 것은 beforeRoute 파일 참조.
  */
