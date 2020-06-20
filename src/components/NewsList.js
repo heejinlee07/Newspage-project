@@ -1,4 +1,5 @@
 // api를 요청하고 뉴스 데이터가 들어 있는 배열을 컴포넌트 배열로 변환하여 렌더링
+// props로 받아온 category에 따라 카테고리를 지정하여 api요청
 
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
@@ -19,7 +20,7 @@ const NewsListBlock = styled.div`
   }
 `;
 
-const NewsList = () => {
+const NewsList = ({ category }) => {
   const [articles, setArticles] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -27,7 +28,8 @@ const NewsList = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await api.get(`top-headlines?country=kr&apiKey=${API_KEY}`);
+        const query = category === "all" ? "" : `&category=${category}`;
+        const response = await api.get(`top-headlines?country=kr${query}&apiKey=${API_KEY}`);
         setArticles(response.data.articles);
         console.log(response.data.articles);
       } catch (e) {
@@ -36,7 +38,7 @@ const NewsList = () => {
       setLoading(false);
     };
     fetchData();
-  }, []);
+  }, [category]);
 
   if (loading) {
     return <NewsListBlock>대기중...</NewsListBlock>;
